@@ -1,12 +1,19 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const glob = require('glob');
+
+const entryFiles = {};
+glob.sync('./src/*.ts').forEach((file) => {
+  const name = path.basename(file, '.ts');
+  entryFiles[name] = file;
+});
 
 module.exports = {
   mode: 'development',
-  entry: './src/index.ts',
+  entry: entryFiles,
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'index.js'
+    filename: '[name].js'
   },
   resolve: {
     extensions: ['.ts', '.js']
@@ -23,7 +30,7 @@ module.exports = {
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'src/index.html', to: 'index.html' },
+        { from: 'src/*.html', to: '[name][ext]' },
         { from: 'src/index.css', to: 'index.css' },
         { from: 'src/upnext-styles.min.css', to: 'upnext-styles.min.css' }
       ]
