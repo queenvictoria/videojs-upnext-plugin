@@ -32,8 +32,12 @@ player.autoplay(true);
   cancel: () => {
     console.log('cancel');
   },
+  replay: () => {
+    console.log('replay');
+  },
   hasNext: () => {
-    return true;
+    console.log('hasNext');
+    return false;
   }
 });
 

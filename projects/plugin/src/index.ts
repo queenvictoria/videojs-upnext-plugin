@@ -13,10 +13,7 @@ const Component = videojs.getComponent('Component');
  * @returns The HTML for the upnext template.
  */
 const getUpnextTemplate = (options: VideoJsUpnextPluginOptions) => {
-  return `
-<div class="vjs-upnext-overlay"></div>
-<div class="vjs-upnext-container" data-vjs-upnext-container>
-  <div class="vjs-upnext-header-container"><span class="vjs-upnext-header-title">${options.headText}</span></div>
+  const defaultContent = `
   <div class="vjs-play-next-container" data-vjs-upnext-play>
     <div class="vjs-play-next-banner-container">
       <div class="img"></div>
@@ -32,7 +29,21 @@ const getUpnextTemplate = (options: VideoJsUpnextPluginOptions) => {
       </svg>
     </div>
   </div>
-    <div class="vjs-upnext-cancel-button" data-vjs-upnext-cancel><a title="${options.cancelText}">x</a></div>
+  `;
+
+  const replayContent = `
+  <div class="vjs-upnext-replay" data-vjs-upnext-replay>
+    Replay
+  </div>
+  `;
+
+  return `
+<div class="vjs-upnext-overlay"></div>
+<div class="vjs-upnext-container" data-vjs-upnext-container>
+
+  <div class="vjs-upnext-header-container"><span class="vjs-upnext-header-title">${options.headText}</span></div>
+  ${options.hasNext() ? defaultContent : replayContent}
+  <div class="vjs-upnext-cancel-button" data-vjs-upnext-cancel><a title="${options.cancelText}">x</a></div>
 </div>
     `;
 };
@@ -69,6 +80,11 @@ export class UpnextCard extends Component {
      * The play next container attribute name.
      */
     upnextPlayContainer: '[data-vjs-upnext-play]',
+
+    /**
+     * The play next container attribute name.
+     */
+    upnextReplay: 'data-vjs-upnext-replay',
 
     /**
      * The upnext progress circle attribute name.
@@ -165,27 +181,29 @@ export class UpnextCard extends Component {
   private setupInteractions = (upnextContainer: HTMLDivElement) => {
     const { pluginOptions, toggleControls, removeUpnextControl, controlSelectors, playNext, replay } = this;
 
-    // Set the animation duration of the progress circle
-    const progress = upnextContainer.querySelector(this.controlSelectors.upnextProgress) as SVGCircleElement | null;
-    if (progress) {
-      progress.style.setProperty('--progress-animation-duration', `${pluginOptions.interval}s`);
-      console.log('animateProgressCircle');
-    }
+    if (pluginOptions.hasNext()) {
+      // Set the animation duration of the progress circle
+      const progress = upnextContainer.querySelector(this.controlSelectors.upnextProgress) as SVGCircleElement | null;
+      if (progress) {
+        progress.style.setProperty('--progress-animation-duration', `${pluginOptions.interval}s`);
+        console.log('animateProgressCircle');
+      }
 
-    // Start the countdown timer until the next video plays
-    this.timeoutId = setTimeout(() => {
-      playNext(upnextContainer);
-    }, pluginOptions.interval * 1000);
+      // Start the countdown timer until the next video plays
+      this.timeoutId = setTimeout(() => {
+        playNext(upnextContainer);
+      }, pluginOptions.interval * 1000);
+    }
 
     // Hide the controls during the countdown
     toggleControls(false);
 
     // Handle click events on the close button of the upnext card
-    const nextClose = upnextContainer.querySelector(controlSelectors.upnextCancel);
-    if (nextClose) {
+    const closeElement = upnextContainer.querySelector(controlSelectors.upnextCancel);
+    if (closeElement) {
       // Cancel the timeout using the ID
 
-      nextClose.addEventListener('click', () => {
+      closeElement.addEventListener('click', () => {
         console.log('Close clicked');
         pluginOptions.cancel();
         removeUpnextControl(upnextContainer);
@@ -193,19 +211,19 @@ export class UpnextCard extends Component {
     }
 
     // Handle click events on the play next button of the upnext card
-    const playNextContainer = upnextContainer.querySelector(controlSelectors.upnextPlayContainer);
-    if (playNextContainer) {
+    const playNextElement = upnextContainer.querySelector(controlSelectors.upnextPlayContainer);
+    if (playNextElement) {
       // Cancel the timeout using the ID
-      playNextContainer.addEventListener('click', () => {
+      playNextElement.addEventListener('click', () => {
         console.log('Play next clicked');
         playNext(upnextContainer);
       });
     }
 
     // Handle click events on the replay button of the upnext card
-    const replayContainer = upnextContainer.querySelector(`[${controlSelectors.upnextReplay}]`);
-    if (replayContainer) {
-      replayContainer.addEventListener('click', () => {
+    const replayElement = upnextContainer.querySelector(`[${controlSelectors.upnextReplay}]`);
+    if (replayElement) {
+      replayElement.addEventListener('click', () => {
         replay(upnextContainer);
         removeUpnextControl(upnextContainer);
       });
