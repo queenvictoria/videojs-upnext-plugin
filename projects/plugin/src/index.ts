@@ -16,7 +16,6 @@ const getUpnextTemplate = (options: VideoJsUpnextPluginOptions) => {
   return `
 <div class="vjs-upnext-overlay"></div>
 <div class="vjs-upnext-container" data-vjs-upnext-container>
-
   <div class="vjs-upnext-header-container"><span class="vjs-upnext-header-title">${options.headText}</span></div>
   <div class="vjs-play-next-container" data-vjs-upnext-play>
     <div class="vjs-play-next-banner-container">
@@ -33,7 +32,7 @@ const getUpnextTemplate = (options: VideoJsUpnextPluginOptions) => {
       </svg>
     </div>
   </div>
-   <div class="vjs-upnext-cancel-button" data-vjs-upnext-cancel><a title="${options.cancelText}">x</a></div>
+    <div class="vjs-upnext-cancel-button" data-vjs-upnext-cancel><a title="${options.cancelText}">x</a></div>
 </div>
     `;
 };
@@ -59,24 +58,22 @@ export class UpnextCard extends Component {
     /**
      * The upnext container selector.
      */
-    // Use attribute names (without brackets) so callers can form
-    // a querySelector string like `[${attr}]`.
-    upnextContainer: 'data-vjs-upnext-container',
+    upnextContainer: '[data-vjs-upnext-container]',
 
     /**
      * The upnext cancel button attribute name.
      */
-    upnextCancel: 'data-vjs-upnext-cancel',
+    upnextCancel: '[data-vjs-upnext-cancel]',
 
     /**
      * The play next container attribute name.
      */
-    upnextPlayContainer: 'data-vjs-upnext-play',
+    upnextPlayContainer: '[data-vjs-upnext-play]',
 
     /**
      * The upnext progress circle attribute name.
      */
-    upnextProgress: 'data-vjs-upnext-progress'
+    upnextProgress: '[data-vjs-upnext-progress]'
   };
 
   /**
@@ -158,17 +155,16 @@ export class UpnextCard extends Component {
     const { pluginOptions, toggleControls, removeUpnextControl, controlSelectors, playNext } = this;
 
     // Set the animation duration of the progress circle
-    const progress = document.getElementById(this.controlSelectors.upnextProgress) as SVGCircleElement | null;
-    if (!progress) {
-      return;
+    const progress = upnextContainer.querySelector(this.controlSelectors.upnextProgress) as SVGCircleElement | null;
+    if (progress) {
+      progress.style.setProperty('--progress-animation-duration', `${pluginOptions.interval}s`);
+      console.log('animateProgressCircle');
     }
-    progress.style.setProperty('--progress-animation-duration', `${pluginOptions.interval}s`);
+
     // Start the countdown timer until the next video plays
     this.timeoutId = setTimeout(() => {
       playNext(upnextContainer);
     }, pluginOptions.interval * 1000);
-
-    console.log('animateProgressCircle');
 
     // Hide the controls during the countdown
     toggleControls(false);
