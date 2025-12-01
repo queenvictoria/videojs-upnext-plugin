@@ -84,6 +84,11 @@ export class UpnextCard extends Component {
   private timeoutId: any;
 
   /**
+   * Optional cleanup callback returned by a custom `render` function.
+   */
+  private renderCleanup: (() => void) | null = null;
+
+  /**
    * Constructs a new instance of the UpnextCard component.
    * @param videoJsPlayer - The video.js player instance.
    * @param pluginOptions - The options for the upnext plugin.
@@ -112,6 +117,16 @@ export class UpnextCard extends Component {
    * @param upnextContainer - The upnext control element to be removed.
    */
   private removeUpnextControl = (upnextContainer: HTMLDivElement) => {
+    // If a custom render returned a cleanup function, call it before removing DOM
+    if (this.renderCleanup) {
+      try {
+        this.renderCleanup();
+      } catch (_e) {
+        // swallow errors during cleanup
+      }
+      this.renderCleanup = null;
+    }
+
     upnextContainer.remove();
     this.toggleControls(true);
     clearTimeout(this.timeoutId);
@@ -139,10 +154,36 @@ export class UpnextCard extends Component {
 
     // Create the upnext card element
     const upnextContainer = document.createElement('div');
-    upnextContainer.innerHTML = getUpnextTemplate(pluginOptions);
+    upnextContainer.className = 'vjs-upnext-root';
     upnextContainer.style.setProperty('--video-image-url', `url(${pluginOptions.getVideoImageUrl()})`);
+
+    // If a consumer provides a `render` function, call it and store an
+    // optional cleanup callback it may return. Otherwise fall back to
+    // the original string-template rendering.
+    if (pluginOptions.render) {
+      try {
+        const maybeCleanup = pluginOptions.render(upnextContainer, pluginOptions);
+        if (typeof maybeCleanup === 'function') {
+          this.renderCleanup = maybeCleanup;
+        }
+      } catch (_err) {
+        // On error fall back to default template
+        upnextContainer.innerHTML = getUpnextTemplate(pluginOptions);
+      }
+    } else {
+      upnextContainer.innerHTML = getUpnextTemplate(pluginOptions);
+    }
+
     videoJsPlayer.el().appendChild(upnextContainer);
-    this.setupInteractions(upnextContainer);
+
+    // If a consumer provided a render function it may mount asynchronously
+    // (e.g. React). Delay setup to the next animation frame so mounts can
+    // complete. For the default template we run setup synchronously.
+    if (pluginOptions.render) {
+      setTimeout(() => this.setupInteractions(upnextContainer), 50);
+    } else {
+      this.setupInteractions(upnextContainer);
+    }
   };
 
   /**
@@ -306,6 +347,14 @@ export interface VideoJsUpnextPluginOptions {
    * A function to call when the Up Next card is closed or cancelled.
    */
   cancel: () => void;
+  /**
+   * Optional render hook for frameworks like React. If provided, the
+   * function will be called with a container element where the consumer
+   * should mount/render their UI. The function may return an optional
+   * cleanup callback which will be invoked when the plugin removes the
+   * upnext card.
+   */
+  render?: (container: HTMLElement, options?: VideoJsUpnextPluginOptions) => void | (() => void);
 }
 
 // console.log(videojs.getPlugins());
