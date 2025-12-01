@@ -65,12 +65,14 @@ You can get upnext-styles.min.css from the root of this package.
 
 ## Plugin Options
 
-| Option             | Type       | Default     | Description                                                                       |
-| ------------------ | ---------- | ----------- | --------------------------------------------------------------------------------- |
-| `interval`         | `number`   | `20`        | The interval, in seconds, before the next video starts playing.                   |
-| `headText`         | `string`   | `'Up Next'` | The text displayed at the top of the Up Next card.                                |
-| `cancelText`       | `string`   | `'Cancel'`  | The text displayed on the Cancel button.                                          |
-| `getTitle`         | `function` | `() => ''`  | A function that returns the title of the next video to be played.                 |
-| `getVideoImageUrl` | `function` | `() => ''`  | A function that returns the URL of the image to be displayed on the Up Next card. |
-| `playNext`         | `function` | `() => {}`  | A function that is called when the user clicks the "Play Next" button.            |
-| `cancel`           | `function` | `() => {}`  | A function that is called when the user clicks the "Cancel" button.               |
+| Option             | Type       | Default      | Description                                                                                                                                |
+| ------------------ | ---------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `interval`         | `number`   | `20`         | The interval, in seconds, before the next video starts playing.                                                                            |
+| `headText`         | `string`   | `'Up Next'`  | The text displayed at the top of the Up Next card.                                                                                         |
+| `cancelText`       | `string`   | `'Cancel'`   | The text displayed on the Cancel button.                                                                                                   |
+| `getTitle`         | `function` | `() => ''`   | A function that returns the title of the next video to be played.                                                                          |
+| `getVideoImageUrl` | `function` | `() => ''`   | A function that returns the URL of the image to be displayed on the Up Next card.                                                          |
+| `hasNext`          | `function` | `() => true` | A function that returns a boolean indicating whether there is a next video. When `false`, the replay button is shown instead of play next. |
+| `playNext`         | `function` | `() => {}`   | A function that is called when the user clicks the "Play Next" button.                                                                     |
+| `replay`           | `function` | `() => {}`   | A function that is called when the user clicks the "Replay" button (shown when `hasNext()` returns `false`).                               |
+| `cancel`           | `function` | `() => {}`   | A function that is called when the user clicks the "Cancel" button.                                                                        |
