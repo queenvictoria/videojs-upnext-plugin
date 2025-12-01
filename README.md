@@ -104,10 +104,11 @@ npm install -g yalc
 
 1. Clone this repository and navigate to the `projects/plugin` directory.
 2. Run `npm install` to install the package's dependencies.
-3. Run `npm run watch` to build the TypeScript files.
-4. Navigate to the `projects/demo/typescript` directory and run `npm install` to install the consumer project's dependencies.
-5. Run `yalc add @kokotree-inc/videojs-upnext-plugin` to add the package to the consumer project. (Next time you have to
-6. Run `npm run watch` to start the demo project. It will open a browser window at `http://192.168.0.100:3000/`.
+3. Run `yalc publish` to publish the plugin locally.
+4. Run `npm run watch` to build the TypeScript files.
+5. Navigate to the `projects/demo/typescript` directory and run `npm install` to install the consumer project's dependencies.
+6. Run `yalc add @kokotree-inc/videojs-upnext-plugin` to add the package to the consumer project. (Next time you have to
+7. Run `npm run watch` to start the demo project. It will open a browser window at `http://192.168.0.100:3000/`.
 
 ## License
 

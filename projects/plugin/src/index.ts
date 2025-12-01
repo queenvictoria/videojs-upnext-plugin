@@ -136,13 +136,24 @@ export class UpnextCard extends Component {
   private handleVideoEnded = () => {
     console.log('Video ended');
 
-    const { videoJsPlayer, pluginOptions, toggleControls, removeUpnextControl, controlSelectors, playNext } = this;
+    const { videoJsPlayer, pluginOptions } = this;
 
     // Create the upnext card element
     const upnextContainer = document.createElement('div');
     upnextContainer.innerHTML = getUpnextTemplate(pluginOptions);
     upnextContainer.style.setProperty('--video-image-url', `url(${pluginOptions.getVideoImageUrl()})`);
     videoJsPlayer.el().appendChild(upnextContainer);
+    this.setupInteractions(upnextContainer);
+  };
+
+  /**
+   * Set up the behaviours and listeners for the upnext control.
+   *
+   * @param upnextContainer - The upnext control element.
+   * @returns void
+   */
+  private setupInteractions = (upnextContainer: HTMLDivElement) => {
+    const { pluginOptions, toggleControls, removeUpnextControl, controlSelectors, playNext } = this;
 
     // Set the animation duration of the progress circle
     const circle = document.getElementById(this.controlSelectors.upnextProgressCircle) as SVGCircleElement | null;
