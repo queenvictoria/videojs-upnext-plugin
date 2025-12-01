@@ -15,26 +15,26 @@ const Component = videojs.getComponent('Component');
 const getUpnextTemplate = (options: VideoJsUpnextPluginOptions) => {
   return `
 <div class="vjs-upnext-overlay"></div>
-<div class="vjs-upnext-container">  
- 
+<div class="vjs-upnext-container" data-vjs-upnext-container>
+
   <div class="vjs-upnext-header-container"><span class="vjs-upnext-header-title">${options.headText}</span></div>
-  <div class="vjs-play-next-container">
+  <div class="vjs-play-next-container" data-vjs-upnext-play>
     <div class="vjs-play-next-banner-container">
       <div class="img"></div>
-    </div> 
+    </div>
     <div class="vjs-upnext-title">${options.getTitle()}</div>
-    <div class="vjs-upnext-progress-container">
+    <div class="vjs-upnext-progress-container" data-vjs-upnext-progress>
       <svg viewBox="0 0 90 90" preserveAspectRatio="xMinYMin meet">
         <circle class="vjs-upnext-progress-circle-background" cx="40" cy="40" r="40"></circle>
         <circle id="vjs-upnext-progress-circle" class="vjs-upnext-progress-circle" cx="40" cy="40" r="40"></circle>
           <svg viewBox="0 0 24 24" width="60" height="80">
             <path transform="rotate(90 12 12) translate(1,-4)" fill="#fff" d="M8 5v14l11-7z"></path>
-          </svg>          
-      </svg> 
-    </div>    
+          </svg>
+      </svg>
+    </div>
   </div>
-   <div class="vjs-upnext-cancel-button"><a title="${options.cancelText}">x</a></div>
-</div> 
+   <div class="vjs-upnext-cancel-button" data-vjs-upnext-cancel><a title="${options.cancelText}">x</a></div>
+</div>
     `;
 };
 
@@ -53,28 +53,30 @@ export class UpnextCard extends Component {
   pluginOptions: VideoJsUpnextPluginOptions;
 
   /**
-   * CSS selectors for the upnext controls.
+   * Data selectors for the upnext controls.
    */
   controlSelectors = {
     /**
      * The upnext container selector.
      */
-    upnextContainer: '.vjs-upnext-container',
+    // Use attribute names (without brackets) so callers can form
+    // a querySelector string like `[${attr}]`.
+    upnextContainer: 'data-vjs-upnext-container',
 
     /**
-     * The upnext cancel button selector.
+     * The upnext cancel button attribute name.
      */
-    upnextCancel: '.vjs-upnext-cancel-button',
+    upnextCancel: 'data-vjs-upnext-cancel',
 
     /**
-     * The play next container selector.
+     * The play next container attribute name.
      */
-    upnextPlayContainer: '.vjs-play-next-container',
+    upnextPlayContainer: 'data-vjs-upnext-play',
 
     /**
-     * The upnext progress circle selector.
+     * The upnext progress circle attribute name.
      */
-    upnextProgressCircle: 'vjs-upnext-progress-circle'
+    upnextProgress: 'data-vjs-upnext-progress'
   };
 
   /**
@@ -156,12 +158,11 @@ export class UpnextCard extends Component {
     const { pluginOptions, toggleControls, removeUpnextControl, controlSelectors, playNext } = this;
 
     // Set the animation duration of the progress circle
-    const circle = document.getElementById(this.controlSelectors.upnextProgressCircle) as SVGCircleElement | null;
-    if (!circle) {
+    const progress = document.getElementById(this.controlSelectors.upnextProgress) as SVGCircleElement | null;
+    if (!progress) {
       return;
     }
-    circle.style.setProperty('--progress-animation-duration', `${pluginOptions.interval}s`);
-
+    progress.style.setProperty('--progress-animation-duration', `${pluginOptions.interval}s`);
     // Start the countdown timer until the next video plays
     this.timeoutId = setTimeout(() => {
       playNext(upnextContainer);
