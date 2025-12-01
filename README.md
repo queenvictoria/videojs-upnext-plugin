@@ -46,6 +46,8 @@ player.upnext({
 });
 ```
 
+_Setting interval to -1 will disable the autoplay feature._
+
 HTML
 
 ```html
