@@ -129,6 +129,17 @@ export class UpnextCard extends Component {
   };
 
   /**
+   * Replay the current video and remove the upnext control.
+   * @param upnextContainer - The upnext control element to be removed.
+   */
+  private replay = (upnextContainer: HTMLDivElement) => {
+    const { pluginOptions, removeUpnextControl } = this;
+
+    pluginOptions.replay();
+    removeUpnextControl(upnextContainer);
+  };
+
+  /**
    * Handles the "ended" event on the video player. Displays the upnext card and starts the countdown timer
    * until the next video plays.
    */
@@ -152,7 +163,7 @@ export class UpnextCard extends Component {
    * @returns void
    */
   private setupInteractions = (upnextContainer: HTMLDivElement) => {
-    const { pluginOptions, toggleControls, removeUpnextControl, controlSelectors, playNext } = this;
+    const { pluginOptions, toggleControls, removeUpnextControl, controlSelectors, playNext, replay } = this;
 
     // Set the animation duration of the progress circle
     const progress = upnextContainer.querySelector(this.controlSelectors.upnextProgress) as SVGCircleElement | null;
@@ -190,6 +201,15 @@ export class UpnextCard extends Component {
         playNext(upnextContainer);
       });
     }
+
+    // Handle click events on the replay button of the upnext card
+    const replayContainer = upnextContainer.querySelector(`[${controlSelectors.upnextReplay}]`);
+    if (replayContainer) {
+      replayContainer.addEventListener('click', () => {
+        replay(upnextContainer);
+        removeUpnextControl(upnextContainer);
+      });
+    }
   };
 }
 
@@ -223,10 +243,16 @@ export class VideoJsUpnextPlugin extends Plugin {
     playNext: function (): void {
       throw new Error('Function not implemented.');
     },
+    replay(): void {
+      throw new Error('Function not implemented.');
+    },
     cancel: function (): void {
       throw new Error('Function not implemented.');
     },
     getVideoImageUrl: function (): string {
+      throw new Error('Function not implemented.');
+    },
+    hasNext(): boolean {
       throw new Error('Function not implemented.');
     }
   };
@@ -299,6 +325,11 @@ export interface VideoJsUpnextPluginOptions {
    */
   getVideoImageUrl: () => string;
   /**
+   * A function that returns whether there is a next video available.
+   * When false, the replay button is shown instead of play next.
+   */
+  hasNext: () => boolean;
+  /**
    * A function to call when the "play next" button in the Up Next card is clicked.
    */
   playNext: () => void;
@@ -306,6 +337,10 @@ export interface VideoJsUpnextPluginOptions {
    * A function to call when the Up Next card is closed or cancelled.
    */
   cancel: () => void;
+  /**
+   * A function to call when the replay button in the Up Next card is clicked.
+   */
+  replay: () => void;
 }
 
 // console.log(videojs.getPlugins());
