@@ -152,19 +152,22 @@ export class UpnextCard extends Component {
    * @returns void
    */
   private setupInteractions = (upnextContainer: HTMLDivElement) => {
+    console.log('setupInteractions');
     const { pluginOptions, toggleControls, removeUpnextControl, controlSelectors, playNext } = this;
 
-    // Set the animation duration of the progress circle
-    const progress = upnextContainer.querySelector(this.controlSelectors.upnextProgress) as SVGCircleElement | null;
-    if (progress) {
-      progress.style.setProperty('--progress-animation-duration', `${pluginOptions.interval}s`);
-      console.log('animateProgressCircle');
-    }
+    if (pluginOptions.interval >= 0) {
+      // Set the animation duration of the progress circle
+      const progress = upnextContainer.querySelector(this.controlSelectors.upnextProgress) as SVGCircleElement | null;
+      if (progress) {
+        progress.style.setProperty('--progress-animation-duration', `${pluginOptions.interval}s`);
+        console.log('animateProgressCircle');
+      }
 
-    // Start the countdown timer until the next video plays
-    this.timeoutId = setTimeout(() => {
-      playNext(upnextContainer);
-    }, pluginOptions.interval * 1000);
+      // Start the countdown timer until the next video plays
+      this.timeoutId = setTimeout(() => {
+        playNext(upnextContainer);
+      }, pluginOptions.interval * 1000);
+    }
 
     // Hide the controls during the countdown
     toggleControls(false);
@@ -173,7 +176,6 @@ export class UpnextCard extends Component {
     const nextClose = upnextContainer.querySelector(controlSelectors.upnextCancel);
     if (nextClose) {
       // Cancel the timeout using the ID
-
       nextClose.addEventListener('click', () => {
         console.log('Close clicked');
         pluginOptions.cancel();
